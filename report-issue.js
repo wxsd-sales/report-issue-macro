@@ -39,7 +39,7 @@ const config = {
   submitText: 'Submit Issue',       // Text displays on the submit button
   waitingText: 'Sending Feedback',
   showAlert: true,                  // Show success and error alerts while true. One waiting alert is shown while false
-  serviceUrl: 'https://<Your Webhook URL>',
+  serviceUrl: 'https://report-issue.wbx.ninja/report-issue-bot-request',
   allowInsecureHTTPs: true,         // Allow insecure HTTPS connections to the instant connect broker for testing
   panelId: 'feedback',
   start: {
@@ -122,13 +122,22 @@ function main() {
   xapi.Config.HttpClient.Mode.set('On');
   xapi.Config.HttpClient.AllowHTTP.set(config.allowInsecureHTTPs ? 'True' : 'False');
 
+  // Get Device Details
   xapi.Status.SystemUnit.Software.DisplayName.get()
   .then(result => {identification.software = result})
   .catch(e=>console.log('Could not get DisplayName: ' + e.message))
 
+  xapi.Status.SystemUnit.Hardware.Module.SerialNumber.get()
+  .then(result => {identification.SerialNumber = result})
+  .catch(e=>console.log('Could not get SerialNumber: ' + e.message))
+
+  xapi.Status.SystemUnit.ProductId.get()
+  .then(result => {identification.ProductId = result})
+  .catch(e=>console.log('Could not get ProductId: ' + e.message))
+
   xapi.Status.Webex.DeveloperId.get()
   .then(result => {identification.deviceId = result})
-  .catch(e=>console.log('Could not get Device Id: ' + e.message))
+  .catch(e=>console.log('Could not get Device Id: ' + e.message)
 
   xapi.Status.UserInterface.ContactInfo.ContactMethod[1].Number.get()
   .then(result => {identification.contactNumber = result})
@@ -141,7 +150,7 @@ function main() {
   xapi.Event.UserInterface.Message.TextInput.Response.on(processInput);
   xapi.Event.UserInterface.Extensions.Widget.Action.on(processWidget);
 
-  // Reset the previous input when the panel is opened
+  // Reset the previous inputs when the panel is opened
   xapi.Event.UserInterface.Extensions.Panel.Clicked.on(event => {
     if (event.PanelId != config.panelId) return
     inputs = {};
@@ -239,8 +248,9 @@ function parseJSON(inputString) {
 async function sendInformation() {
   alert('Sending', config.waitingText, 10);
   inputs.identification = identification;
-  inputs.booking = await getBookingId();
-  inputs.callId = await getCallId();
+  inputs.bookingId = await getBookingId();
+  inputs.callDetails = await getCallDetails();
+  inputs.conferenceDetails = await getConferenceDetails();
 
   console.log(inputs)
   xapi.Command.HttpClient.Post(
@@ -252,30 +262,34 @@ async function sendInformation() {
     },
     JSON.stringify(inputs)
   ).then(result => {
-
     // Check the response from the server display the correct message
-
     const body = parseJSON(result.Body);
     alert('Success', 'Feedback sent, please wait for an agent to process', 10);
-
   })
     .catch(err => {
       alert('Error', JSON.stringify(err))
     });
 }
 
-function getCallId(){
+function getCallDetails(){
   return xapi.Status.Call.get()
     .then(result => {
-      console.log(result.length)
-      return ( result.length > 0 ) ? result[0].id : null
+      console.log('Current CallId:', ( result.length > 0 ) ? result[0].id : null)
+      return ( result.length > 0 ) ? result[0] : null
+    });
+}
+
+function getConferenceDetails(){
+  return xapi.Status.Conference.Call.get()
+    .then(result => {
+      return (result.lenght > 0) ? result[0] : null;
     });
 }
 
 function getBookingId(){
   return xapi.Status.Bookings.Current.Id.get()
   .then(result => {
-    console.log(result)
+    console.log('Current Booking Id:', (result == '') ? null : result)
     return (result == '') ? null : result;
   });
 }
@@ -291,7 +305,6 @@ function arrayContains(array, contains) {
 }
 
 function createPanel(state) {
-  //console.log('Inputs: ' + JSON.stringify(inputs));
 
   function createWidget(key, type, name, options) {
     return `<Widget>
@@ -380,5 +393,4 @@ function createPanel(state) {
     xapi.Command.UserInterface.Extensions.Widget.SetValue(
       { Value: value, WidgetId: key });
   }
-
 }
