@@ -252,7 +252,7 @@ async function sendInformation() {
   inputs.callDetails = await getCallDetails();
   inputs.conferenceDetails = await getConferenceDetails();
 
-  console.log(inputs)
+  console.log(JSON.stringify(inputs))
   xapi.Command.HttpClient.Post(
     {
       AllowInsecureHTTPS: true,
@@ -282,7 +282,7 @@ function getCallDetails(){
 function getConferenceDetails(){
   return xapi.Status.Conference.Call.get()
     .then(result => {
-      return (result.lenght > 0) ? result[0] : null;
+      return (result.length > 0) ? result : null;
     });
 }
 
