@@ -39,7 +39,7 @@ const config = {
   submitText: 'Submit Issue',       // Text displays on the submit button
   waitingText: 'Sending Feedback',
   showAlert: true,                  // Show success and error alerts while true. One waiting alert is shown while false
-  serviceUrl: 'https://webhook.site/1ccfe2b3-6719-4ca6-b567-10395e2cf1e0',
+  serviceUrl: 'https://<Your Webhook URL>',
   allowInsecureHTTPs: true,         // Allow insecure HTTPS connections to the instant connect broker for testing
   panelId: 'feedback',
   start: {
@@ -63,7 +63,7 @@ const config = {
           options: 'size=2'
         }
       },
-      action: 'TextInput',
+      action: 'Options',
       placeholder: 'eg. Please select category',
       promptText: 'Please enter the problem description',         // Text input message
       inputType: 'SingleLine',   // Type of input field. SingleLine = alphanum, other options (Numeric, Password, PIN)
@@ -71,28 +71,8 @@ const config = {
       visiable: true,     // True = field is visable | False = field is removed from UI
       modifiable: true   // If false, placeholder will be used always
     },
-    description: {
-      requires: ['category'],
-      type: {
-        Text: {
-          prefix: 'Description:',
-          options: 'size=2;fontSize=normal;align=left'
-        },
-        Button: {
-          name: ['Enter description', 'Change description'],
-          options: 'size=2'
-        }
-      },
-      action: 'TextInput',
-      placeholder: 'eg. Can\`t connect to room system',
-      promptText: 'Please enter the problem description',         // Text input message
-      inputType: 'SingleLine',   // Type of input field. SingleLine = alphanum, other options (Numeric, Password, PIN)
-      showPlaceholder: true,
-      visiable: true,     // True = field is visable | False = field is removed from UI
-      modifiable: true   // If false, placeholder will be used always
-    },
     name: {
-      requires: ['category', 'description'],
+      requires: ['category'],
       type: {
         Text: {
           prefix: 'Name:',
@@ -104,7 +84,7 @@ const config = {
         }
       },
       action: 'TextInput',
-      placeholder: 'eg. John Smith',
+      placeholder: 'eg. John Smith (optional)',
       promptText: 'Please enter your name',
       inputType: 'SingleLine',
       showPlaceholder: true,
@@ -112,7 +92,7 @@ const config = {
       modifiable: true
     },
     submit: {
-      requires: ['category', 'description', 'name'],
+      requires: ['category'],
       visiable: true,
       modifiable: true,
       action: 'Submit',
@@ -134,7 +114,6 @@ const config = {
 
 /// Marco variables
 let inputs = {};
-let callId = '';
 let identification = {};
 
 function main() {
@@ -180,7 +159,7 @@ setTimeout(main, 1000);
 
 // Listen for clicks on the buttons
 function processWidget(event) {
-  console.log(event);
+  // console.log(event);
   if (event.Type !== 'clicked') return
 
   console.log(event.WidgetId + ' Clicked');
@@ -189,6 +168,9 @@ function processWidget(event) {
     switch (config.form[event.WidgetId].action) {
       case 'TextInput':
         createInput(event.WidgetId);
+        break;
+      case 'Options':
+        createPanel('start');
         break;
       case 'Submit':
         xapi.Command.UserInterface.Extensions.Panel.Close();
@@ -254,9 +236,13 @@ function parseJSON(inputString) {
 }
 
 // The function will post the current inputs objects to a configured service URL
-function sendInformation() {
+async function sendInformation() {
   alert('Sending', config.waitingText, 10);
   inputs.identification = identification;
+  inputs.booking = await getBookingId();
+  inputs.callId = await getCallId();
+
+  console.log(inputs)
   xapi.Command.HttpClient.Post(
     {
       AllowInsecureHTTPS: true,
@@ -272,17 +258,27 @@ function sendInformation() {
     const body = parseJSON(result.Body);
     alert('Success', 'Feedback sent, please wait for an agent to process', 10);
 
-    // alert('Success', 'Support services are closed at the moment, this issue will be looked at once services are open again', 10);
-
   })
     .catch(err => {
       alert('Error', JSON.stringify(err))
     });
 }
 
+function getCallId(){
+  return xapi.Status.Call.get()
+    .then(result => {
+      console.log(result.length)
+      return ( result.length > 0 ) ? result[0].id : null
+    });
+}
 
-
-
+function getBookingId(){
+  return xapi.Status.Bookings.Current.Id.get()
+  .then(result => {
+    console.log(result)
+    return (result == '') ? null : result;
+  });
+}
 
 /*********************************************************
  * This function creates/updates the UI
@@ -348,7 +344,7 @@ function createPanel(state) {
         if (type === 'Button') {
           widgets = widgets.concat(createWidget(key, type, inputs.hasOwnProperty(key) ? widget.name[1] : widget.name[0], widget.options));
         } else if (type === 'Text' && (inputs.hasOwnProperty(key) || field.showPlaceholder)) {
-          widgets = widgets.concat(createWidget(key, type, inputs.hasOwnProperty(key) ? widget.prefix + ' ' + inputs[key] : field.placeholder, widget.options));
+          widgets = widgets.concat(createWidget(key+'-text', type, inputs.hasOwnProperty(key) ? widget.prefix + ' ' + inputs[key] : field.placeholder, widget.options));
         }
       }
 
