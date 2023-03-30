@@ -39,7 +39,7 @@ const config = {
   submitText: 'Submit Issue',       // Text displays on the submit button
   waitingText: 'Sending Feedback',
   showAlert: true,                  // Show success and error alerts while true. One waiting alert is shown while false
-  serviceUrl: 'https://report-issue.wbx.ninja/report-issue-bot-request',
+  serviceUrl: 'https://<Your Webhook URL>',
   allowInsecureHTTPs: true,         // Allow insecure HTTPS connections to the instant connect broker for testing
   panelId: 'feedback',
   start: {
