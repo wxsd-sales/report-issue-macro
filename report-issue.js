@@ -137,7 +137,7 @@ function main() {
 
   xapi.Status.Webex.DeveloperId.get()
   .then(result => {identification.deviceId = result})
-  .catch(e=>console.log('Could not get Device Id: ' + e.message)
+  .catch(e=>console.log('Could not get Device Id: ' + e.message))
 
   xapi.Status.UserInterface.ContactInfo.ContactMethod[1].Number.get()
   .then(result => {identification.contactNumber = result})
