@@ -12,7 +12,7 @@
  * and enter issue details which are sent to a Webhook service
  * 
  * 
- * Full Readme and source code available on Github:
+ * Full Readme, source code and license details are available here:
  * https://github.com/wxsd-sales/report-issue-macro
  * 
  ********************************************************/
