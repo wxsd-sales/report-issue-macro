@@ -131,6 +131,11 @@ function main() {
   xapi.Status.UserInterface.ContactInfo.ContactMethod[1].Number.get()
   .then(result => {identification.contactNumber = result})
   .catch(e=>console.log('Could not get Contact Number: ' + e.message))
+  
+  
+  xapi.Status.UserInterface.ContactInfo.Name.get()
+  .then(result => {identification.contactInfoName = result})
+  .catch(e=>console.log('Could not get Contact Info Name: ' + e.message))
 
   // Create the UI
   createPanel();
