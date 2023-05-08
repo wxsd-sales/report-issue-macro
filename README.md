@@ -18,16 +18,19 @@ This is a Webex Device macro which lets a user select issue categories and enter
 2. Configure the Macro by changing the initial values, there are comments explaining each one.
 3. Enable the Macro.
 
-## Demo
-
-*For more demos & PoCs like this, check out our [Webex Labs site](https://collabtoolbox.cisco.com/webex-labs).
-
 ## Validation
 
 Validated Hardware:
 
-* Webex Room Kit Pro
+* Webex Room Kit Pro with Touch 10
 * Webex Desk Pro
+* Board 55 with Touch 10
+
+This macro should work on other Webex Devices but has not been validated at this time.
+
+## Demo
+
+*For more demos & PoCs like this, check out our [Webex Labs site](https://collabtoolbox.cisco.com/webex-labs).
 
 ## License
 
