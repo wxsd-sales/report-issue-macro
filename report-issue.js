@@ -109,7 +109,7 @@ function main() {
 
   // Enable the HTTP Client
   xapi.Config.HttpClient.Mode.set('On');
-  xapi.Config.HttpClient.AllowHTTP.set(config.allowInsecureHTTPs ? 'True' : 'False');
+  xapi.Config.HttpClient.AllowInsecureHTTPS.set(config.allowInsecureHTTPs ? 'True' : 'False');
 
   // Get Device Details
   xapi.Status.SystemUnit.Software.DisplayName.get()
