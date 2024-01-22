@@ -1,15 +1,15 @@
 /*********************************************************
  * 
- * Author:              William Mills
+ * Author:             William Mills
  *                    	Technical Solutions Specialist 
  *                    	wimills@cisco.com
  *                    	Cisco Systems
  * 
  * Version: 1-0-0
- * Released: 02/09/23
+ * Released: 01/22/23
  * 
  * This is a Webex Device macro which lets a user select issue categories 
- * and enter issue details which are sent to a Webhook service
+ * and enter issue details which are sent to a Webhook service.
  * 
  * 
  * Full Readme, source code and license details are available here:
