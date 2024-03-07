@@ -313,7 +313,7 @@ function createPanel(state) {
   let active = {};
 
   if (state == 'start') {
-    const prompt = createWidget('category-text', 'Text', 'Please select a category below:', 'size=3;fontSize=normal;align=left')
+    const prompt = createWidget('category-text', 'Text', 'Please select a category below:', 'size=3;fontSize=normal;align=center')
     fields = fields.concat(`<Row>${prompt}</Row>`);
     config.start.options.forEach( (option, i) => {
       //console.log(i + ':' + option);
